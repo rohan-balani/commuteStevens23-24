@@ -32,5 +32,3 @@ npm start
 
 * 1.0.0
     * Initial Release
-    * Basic website with login/signup features
-    * Shows a basic template of what future sprints will aim to complete
