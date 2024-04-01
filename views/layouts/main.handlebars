@@ -17,18 +17,18 @@
 <body>   
 <div id="map"></div>
 
-
 <script>
-        var map = L.map('map').setView([0, 0], 11); // Initial center
+    var map = L.map('map').setView([0, 0], 11); // Initial center
 
+    // Add a base tile layer
     L.tileLayer('http://{s}.tile.osm.org/{z}/{x}/{y}.png', {
         attribution: '&copy; <a href="http://osm.org/copyright">OpenStreetMap</a> contributors'
     }).addTo(map);
 
     // Function to update map with current location
     function updateMapWithLocation(location) {
-        map.setView([location.coords.latitude, location.coords.longitude], 11);
-        L.marker([location.coords.latitude, location.coords.longitude]).addTo(map)
+        map.setView([40.743904, -74.036096], 11);
+        L.marker([40.743904, -74.036096]).addTo(map)
             .bindPopup('Your current location').openPopup();
     }
 
@@ -41,7 +41,7 @@
 
     // Function to make a request to TravelTime API and draw isochrone
     function drawIsochrone(location, time) {
-        var apiKey = '6508b20eef4a1fc873163942b8902499';
+        var apiKey = 'API_KEY';
         var url = 'https://api.traveltimeapp.com/v4/time-map';
 
         fetch(url, {
@@ -52,7 +52,7 @@
             },
             body: JSON.stringify({
                 "departure_searches": [{
-                    "id": "search",
+                    "id": "isochrone test",
                     "coords": {
                         "lat": location.lat,
                         "lng": location.lng
@@ -80,7 +80,7 @@
     }
 
     // Example usage: draw isochrone for a certain location and time
-    var location = { lat: location.coords.latitude, lng: location.coords.longitude }; // Example location (London)
+    var location = { lat: 40.743904, lng: -74.036096 }; // Example location (London)
     var travelTime = 15; // Example travel time in minutes
     drawIsochrone(location, travelTime);
 
