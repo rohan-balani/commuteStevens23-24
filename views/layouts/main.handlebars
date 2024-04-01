@@ -39,51 +39,6 @@
         alert('Geolocation is not supported by your browser');
     }
 
-    // Function to make a request to TravelTime API and draw isochrone
-    function drawIsochrone(location, time) {
-        var apiKey = '6508b20eef4a1fc873163942b8902499';
-        var url = 'https://api.traveltimeapp.com/v4/time-map';
-
-        fetch(url, {
-            method: 'POST',
-            headers: {
-                'Content-Type': 'application/json',
-                'X-Api-Key': apiKey
-            },
-            body: JSON.stringify({
-                "departure_searches": [{
-                    "id": "search",
-                    "coords": {
-                        "lat": location.lat,
-                        "lng": location.lng
-                    },
-                    "transportation": {
-                        "type": "public_transport"
-                    },
-                    "travel_time": time,
-                    "departure_time": "now"
-                }]
-            })
-        })
-        .then(response => response.json())
-        .then(data => {
-            // Draw isochrone polygons on the map
-            var isochrone = L.geoJSON(data.results[0].shapes, {
-                style: function (feature) {
-                    return { color: '#3388ff', fillColor: '#3388ff', fillOpacity: 0.4, weight: 1 };
-                }
-            }).addTo(map);
-        })
-        .catch(error => {
-            console.error('Error:', error);
-        });
-    }
-
-    // Example usage: draw isochrone for a certain location and time
-    var location = { lat: location.coords.latitude, lng: location.coords.longitude }; // Example location (London)
-    var travelTime = 15; // Example travel time in minutes
-    drawIsochrone(location, travelTime);
-
 {{!-- L.marker([40.743904,-74.036096]).addTo(map)
     .bindPopup('A pretty CSS3 popup.<br> Easily customizable.')
     .openPopup(); --}}
