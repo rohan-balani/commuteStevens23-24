@@ -27,9 +27,9 @@
 
     // Function to update map with current location
     function updateMapWithLocation(location) {
-        map.setView([40.743904, -74.036096], 11);
-        L.marker([40.743904, -74.036096]).addTo(map)
-            .bindPopup('Your current location').openPopup();
+        map.setView([40.74511822940978, -74.02562848172171], 11);
+        L.marker([40.74511822940978, -74.02562848172171]).addTo(map)
+            .bindPopup('Stevens Insitutue of Technology').openPopup();
     }
 
     // If geolocation is supported by the browser
@@ -41,13 +41,16 @@
 
     // Function to make a request to TravelTime API and draw isochrone
     function drawIsochrone(location, time) {
+        var appID = 'APP_ID';
         var apiKey = 'API_KEY';
         var url = 'https://api.traveltimeapp.com/v4/time-map';
 
+        //travelTime API Payload
         fetch(url, {
             method: 'POST',
             headers: {
                 'Content-Type': 'application/json',
+                'X-Application-Id': appID,
                 'X-Api-Key': apiKey
             },
             body: JSON.stringify({
@@ -57,11 +60,11 @@
                         "lat": location.lat,
                         "lng": location.lng
                     },
+                    "departure_time": "now",
+                    "travel_time": time,
                     "transportation": {
                         "type": "public_transport"
-                    },
-                    "travel_time": time,
-                    "departure_time": "now"
+                    }
                 }]
             })
         })
@@ -80,7 +83,7 @@
     }
 
     // Example usage: draw isochrone for a certain location and time
-    var location = { lat: 40.743904, lng: -74.036096 }; // Example location (London)
+    var location = { lat: 40.74511822940978, lng: -74.02562848172171 }; // Example location (Stevens)
     var travelTime = 15; // Example travel time in minutes
     drawIsochrone(location, travelTime);
 
