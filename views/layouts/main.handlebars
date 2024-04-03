@@ -1,49 +1,157 @@
-<main>
-    <h2>Welcome to the Sandbox</h2>
-    <html>
-<head>
-    <link rel="stylesheet" href="https://unpkg.com/leaflet@1.0.3/dist/leaflet.css"
-   integrity="sha512-07I2e+7D8p6he1SIM+1twR5TIrhUQn9+I6yjqD53JQjFiMf8EtC93ty0/5vJTZGF8aAocvHYNEDJajGdNx1IsQ=="
-   crossorigin=""/>
-    <script src="https://unpkg.com/leaflet@1.0.3/dist/leaflet.js"
-   integrity="sha512-A7vV8IFfih/D732iSSKi20u/ooOfj/AGehOKq0f4vLT1Zr2Y+RX7C+w8A1gaSasGtRUZpF/NZgzSAu4/Gc41Lg=="
-   crossorigin=""></script>
-
-   <style>
-       #map { height: 500px; }
-    </style>
-</head>
-
-<body>   
-<div id="map"></div>
-
-
-<script>
-        var map = L.map('map').setView([0, 0], 11); // Initial center
-
-    L.tileLayer('http://{s}.tile.osm.org/{z}/{x}/{y}.png', {
-        attribution: '&copy; <a href="http://osm.org/copyright">OpenStreetMap</a> contributors'
-    }).addTo(map);
-
-    // Function to update map with current location
-    function updateMapWithLocation(location) {
-        map.setView([location.coords.latitude, location.coords.longitude], 11);
-        L.marker([location.coords.latitude, location.coords.longitude]).addTo(map)
-            .bindPopup('Your current location').openPopup();
-    }
-
-    // If geolocation is supported by the browser
-    if ('geolocation' in navigator) {
-        navigator.geolocation.getCurrentPosition(updateMapWithLocation);
-    } else {
-        alert('Geolocation is not supported by your browser');
-    }
-
-{{!-- L.marker([40.743904,-74.036096]).addTo(map)
-    .bindPopup('A pretty CSS3 popup.<br> Easily customizable.')
-    .openPopup(); --}}
-</script>
-
-</body>
+<html lang="en" >
+   <head>
+      <meta charset="UTF-8">
+      <title>Tiles test and isochrone drawing</title>
+   </head>
+   <body>
+      <!DOCTYPE html>
+      <html>
+         <meta name="description" content="Class 10 Show+Tell: GeoJson">
+         <meta charset="utf-8">
+         <meta name="viewport" content="width=device-width">
+         <head>
+            <link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css" integrity="sha256-p4NxAoJBhIIN+hmNHrzRCf9tD/miZyoHS5obTRR9BMY=" crossorigin=""/>
+            <link rel="stylesheet" href="css.css" />
+      
+            <style>
+               html, body, #mapid { 
+               height: 100%;
+               width: 100%;
+               padding: 0;
+               margin: 0;
+               }
+               #error {
+                  position: absolute;
+                  width: 80%;
+                  margin: 0px;
+                  z-index: 2000;
+                  width: 270px;
+                  border-radius: 5px;
+                  max-width: 500px;
+                  font-family: sans-serif;
+                  font-size: 12px;
+                  top: 30%;  /* position the top  edge of the element at the middle of the parent */
+                  left: 50%; /* position the left edge of the element at the middle of the parent */
+                  transform: translate(-50%, -50%);
+                  background-color: white;
+                  padding: 10px;
+                  display: none;
+                  text-align: center;
+              }
+            </style>
+         <script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js"
+             integrity="sha256-20nQCchB9co0qIjJZRGuk2/Z9VM+kNiyxNV1lvTlZBo="
+             crossorigin=""></script>
+         </head>
+         <body>
+            <div id="mapid"></div>
+         </body>
+      </html>
+      <div id="error" class="tippy-tooltip honeybee-theme">
+         <p><b>No API and APPLICATION_ID key inserted </b></p>
+         <p><a target="_blank" href="http://docs.traveltimeplatform.com/overview/getting-keys/">Sign up for an API key</a> 
+         <p>Place it in API and APPLICATION_ID variables</p>
+      </div>
+      <script>
+         // The name of the starting location. We will have to geocode this to coordinates.
+         var startingLocation = "Stevens Institute of Technology";
+         // The departure time in an ISO format.
+         var departureTime = new Date().toJSON();
+         // Travel time in seconds. We want 1 hour travel time so it is 60 minutes x 60 seconds.
+         var travelTime = 60 * 60;
+         // These secret variables are needed to authenticate the request. Get them from http://docs.traveltimeplatform.com/overview/getting-keys/ and replace 
+         var APPLICATION_ID = "8f13b8a0";
+         var API_KEY = "6508b20eef4a1fc873163942b8902499";
+        
+        var mymap = L.map('mapid').setView([40.7451, -74.0256], 9);
+         
+         sendGeocodingRequest(startingLocation); 
+         
+         	L.tileLayer('https://tiles.traveltime.com/lux/{z}/{x}/{y}.png?key=' + APPLICATION_ID, {
+attribution: 'Map data &copy; <a href="https://www.openstreetmap.org/">OpenStreetMap</a> | Created with <a href="http://traveltimeplatform.com" target="_blank">TravelTime API</a>',
+maxZoom: 18,
+tileSize: 512,
+zoomOffset: -1            
+}).addTo(mymap);
+         
+         // Sends the geocoding request.
+         function sendGeocodingRequest(location) {
+           // The request for the geocoder. Reference: http://docs.traveltimeplatform.com/reference/geocoding-search/
+           var request = {
+             query: location };
+           document.getElementById("error").style.display = "none";
+           var xhr = new XMLHttpRequest();
+           xhr.responseType = "json";
+           xhr.open("GET", "https://api.traveltimeapp.com/v4/geocoding/search?query="+ location)
+           xhr.setRequestHeader( "X-Application-Id", APPLICATION_ID);
+           xhr.setRequestHeader( "X-Api-Key", API_KEY);
+           xhr.setRequestHeader( "Accept-Language", " en-US");
+           xhr.onreadystatechange = function () {
+              if (xhr.status >= 200 && xhr.status < 300) {
+                if(xhr.readyState === 4){
+                  sendTimeMapRequest(xhr.response)
+                }
+              } else {
+                if(APPLICATION_ID === "place your app id here" || API_KEY ===  "place your api key here") {
+                  document.getElementById("error").style.display = "block";
+                }
+              }
+          };
+          xhr.send();
+          };
+         
+         // Sends the request of the Time Map multipolygon.
+         function sendTimeMapRequest(geocodingResponse) {
+         
+           // The request for Time Map. Reference: http://docs.traveltimeplatform.com/reference/time-map/
+           var coords = geocodingResponse.features[0].geometry.coordinates;
+           var latLng = { lat: coords[1], lng: coords[0] };
+         
+           var request = {
+             departure_searches: [{
+               id: "first_location",
+               coords: latLng,
+               transportation: {
+                 type: "public_transport" },
+         
+               departure_time: departureTime,
+               travel_time: travelTime }],
+         
+             arrival_searches: [] };
+         
+          var xhr = new XMLHttpRequest()
+          xhr.addEventListener("readystatechange", function () {
+            if (this.readyState === 4) {
+              drawTimeMap(mymap, this.response);
+            }
+          });
+          xhr.open("POST", "https://api.traveltimeapp.com/v4/time-map")
+          xhr.setRequestHeader("X-Application-Id", APPLICATION_ID);
+          xhr.setRequestHeader("X-Api-Key", API_KEY);
+          xhr.setRequestHeader("Content-Type", "application/json; charset=UTF-8");
+          xhr.responseType = "json";
+          xhr.send(JSON.stringify(request));
+         
+         // A helper function that converts [{lat: <lat>, lng: <lng>}, ...] to a [[<lat>, <lng>], ...] format.
+         function ringCoordsHashToArray(ring) {
+           return ring.map(function (latLng) {return [latLng.lat, latLng.lng];});
+         };
+         
+         // Draws the resulting multipolygon from the response on the map.
+         function drawTimeMap(map, response) {
+         
+             // Reference for the response: http://docs.traveltimeplatform.com/reference/time-map/#response-body-json-attributes
+             var shapesCoords = response.results[0].shapes.map(function (polygon) {
+               var shell = ringCoordsHashToArray(polygon.shell);
+               var holes = polygon.holes.map(ringCoordsHashToArray);
+               return [shell].concat(holes);
+             });
+             var polygon = L.polygon(shapesCoords, { color: 'blue' });
+             polygon.addTo(map);
+             map.fitBounds(polygon.getBounds());
+         };
+         }
+            
+      </script>
+   </body>
 </html>
-</main>
