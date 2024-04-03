@@ -1,8 +1,9 @@
 <html lang="en" >
    <head>
       <meta charset="UTF-8">
-      <title>Tiles test and isochrone drawing</title>
+      <title>Sandbox</title>
    </head>
+   
    <body>
       <!DOCTYPE html>
       <html>
@@ -15,10 +16,12 @@
       
             <style>
                html, body, #mapid { 
-               height: 100%;
-               width: 100%;
-               padding: 0;
-               margin: 0;
+               height: 93%;
+               width: 80%;
+               align-items: right;
+               padding: 15px;
+               border-radius: 10px; /* Rounded corners */
+            overflow: hidden; /* Clip content outside the border-radius */
                }
                #error {
                   position: absolute;
@@ -54,7 +57,7 @@
       </div>
       <script>
          // The name of the starting location. We will have to geocode this to coordinates.
-         var startingLocation = "Stevens Institute of Technology";
+         var startingLocation = "Boston City Hall";
          // The departure time in an ISO format.
          var departureTime = new Date().toJSON();
          // Travel time in seconds. We want 1 hour travel time so it is 60 minutes x 60 seconds.
@@ -63,7 +66,7 @@
          var APPLICATION_ID = "8f13b8a0";
          var API_KEY = "6508b20eef4a1fc873163942b8902499";
         
-        var mymap = L.map('mapid').setView([40.7451, -74.0256], 9);
+        var mymap = L.map('mapid').setView([42.360540743034065, -71.05810029159457], 9);
          
          sendGeocodingRequest(startingLocation); 
          
