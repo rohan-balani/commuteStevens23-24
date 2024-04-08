@@ -1,11 +1,11 @@
 # Stevens Senior D Transitfeeds Team 2023-24
 
-Our AI-driven implementation to serve as a POC on how to 
+Our unique implementation to serve as a POC on how to 
 optimize time/cost via multimodal transit in a major city.
 
 ## Description
 
-The past two semesters at Stevens Insitute of Technology for our Senior Design Capstone project, building off of previous TLCEngine (our startup client) teams and online implementations that we have used, tested, and worked to further optimize we aim to create our own AI-driven proof of concept. Here we try to implement new open source efforts along with any optimization algorithms for the MultiModal Transit problem. Multimodal Transit is the use of multiple modes of transportation to reach a destination. This route involves any two or more routes through vessles such as Driving, Ferries, Busses, Trains, Subways, Lightrails, etc. The goal for this project is to further find any ways to estimate, optimize, and provide optimization for time and cost of this travel type for the daily commuter. 
+The past two semesters at Stevens Insitute of Technology for our Senior Design Capstone project, building off of previous TLCEngine (our startup client) teams and online implementations that we have used, tested, and worked to further optimize we aim to create our own proof of concept. Here we try to implement new open source efforts along with any optimization algorithms for the MultiModal Transit problem. Multimodal Transit is the use of multiple modes of transportation to reach a destination. This route involves any two or more routes through vessles such as Driving, Ferries, Busses, Trains, Subways, Lightrails, etc. The goal for this project is to further find any ways to estimate, optimize, and provide optimization for time and cost of this travel type for the daily commuter. 
 
 ### How to Run Application
 
