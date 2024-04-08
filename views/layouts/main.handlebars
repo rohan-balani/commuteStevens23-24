@@ -36,7 +36,24 @@
     </div>
   </div>
     <script>
-        var mymap = L.map('mapid').setView([42.360540743034065, -71.05810029159457], 9);
+        // Create the map with initial view
+        var mymap = L.map('mapid');
+
+        // Function to update map view with user's current location
+        function updateMapView(latitude, longitude) {
+            mymap.setView([latitude, longitude], 15); // Set the view with updated latitude and longitude
+        }
+
+        // Function to handle successful retrieval of user's location
+        function getLocationSuccess(position) {
+            var latitude = position.coords.latitude;
+            var longitude = position.coords.longitude;
+            updateMapView(latitude, longitude); // Update map view with user's current location
+        }
+
+        navigator.geolocation.getCurrentPosition(getLocationSuccess);
+
+        
 
         var APPLICATION_ID = "8f13b8a0";
         var API_KEY = "6508b20eef4a1fc873163942b8902499";
