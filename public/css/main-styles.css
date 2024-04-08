@@ -22,7 +22,7 @@ body {
 html {
     width: 100%;
     height: 90%;
-    background-color: rgb(197, 153, 87);
+    background-color: #f0f0f0;
 }
 
 #mapid {
@@ -90,4 +90,59 @@ html {
     height: 100%;
     margin-left: auto;
     margin-right: auto;
+}
+
+
+
+#travelTimeSlider {
+    width: 30%;
+    margin: 0 auto;
+}
+
+#travelTimeSlider input[type="range"] {
+    width: 100%;
+    height: 10px;
+    background-color: #ddd;
+    border-radius: 5px;
+    -webkit-appearance: none;
+    appearance: none;
+    outline: none;
+}
+
+#travelTimeSlider input[type="range"]::-webkit-slider-thumb {
+    -webkit-appearance: none;
+    appearance: none;
+    width: 20px;
+    height: 20px;
+    background-color: #0074D9;
+    border: 2px solid #fff;
+    border-radius: 50%;
+    cursor: pointer;
+}
+
+#travelTimeSlider input[type="range"]::-moz-range-thumb {
+    width: 20px;
+    height: 20px;
+    background-color: #0074D9;
+    border: 2px solid #fff;
+    border-radius: 50%;
+    cursor: pointer;
+}
+
+#travelTimeValue {
+    font-size: 18px;
+    margin-left: 10px;
+}
+
+#travelTimeSlider button {
+    padding: 5px 10px;
+    border-radius: 5px;
+    font-size: 18px;
+    background-color: #0074D9;
+    color: #fff;
+    cursor: pointer;
+}
+
+#travelTimeSlider button:hover {
+    background-color: #005689;
 }
