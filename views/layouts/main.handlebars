@@ -20,6 +20,14 @@
         <button onclick="searchLocation()">Search</button>
       </div>
     </div>
+
+
+    <div id="travelSlider">
+        <input type="range" id="travelTimeSlider" min="0" max="240" value="30" step="30">
+        <span id="travelTimeValue">30</span> minutes
+    </div>
+
+    
     <div id="mapid"></div>
     <div id="error" class="tippy-tooltip honeybee-theme">
         <p><b>No API and APPLICATION_ID key inserted </b></p>
@@ -47,28 +55,23 @@
             }
         }
 
-        function sendGeocodingRequest(location) {
-            var xhr = new XMLHttpRequest();
-            xhr.responseType = "json";
-            xhr.open("GET", "https://api.traveltimeapp.com/v4/geocoding/search?query="+ location)
-            xhr.setRequestHeader( "X-Application-Id", APPLICATION_ID);
-            xhr.setRequestHeader( "X-Api-Key", API_KEY);
-            xhr.setRequestHeader( "Accept-Language", " en-US");
-            xhr.onreadystatechange = function () {
-                if (xhr.status >= 200 && xhr.status < 300) {
-                    if(xhr.readyState === 4){
-                        sendTimeMapRequest(xhr.response)
-                    }
-                } else {
-                    if(APPLICATION_ID === "place your app id here" || API_KEY ===  "place your api key here") {
-                        document.getElementById("error").style.display = "block";
-                    }
-                }
-            };
-            xhr.send();
-        };
+        //Updates time value in real time
+        document.getElementById("travelTimeSlider").addEventListener("input", function() {
+            const newValue = this.value;
+            document.getElementById("travelTimeValue").textContent = newValue;
+        });
 
-        function sendTimeMapRequest(geocodingResponse) {
+        function getTime() {
+            var timeToTravel = document.getElementById("travelTimeSlider").value;
+            if (timeToTravel.trim() !== "") {
+                timeToTravel = parseInt(timeToTravel, 10)
+                return timeToTravel;
+            }
+            return null;
+        }
+
+        //Adding travelTime parameter to pass through with default value of 30min
+        function sendTimeMapRequest(geocodingResponse, travelTime=30) {
             var coords = geocodingResponse.features[0].geometry.coordinates;
             var latLng = { lat: coords[1], lng: coords[0] };
          
@@ -79,7 +82,7 @@
                     transportation: {
                         type: "public_transport" },
                     departure_time: new Date().toJSON(),
-                    travel_time: 60 * 60
+                    travel_time: travelTime * 60
                 }],
                 arrival_searches: []
             };
@@ -97,6 +100,29 @@
             xhr.responseType = "json";
             xhr.send(JSON.stringify(request));
         }
+
+        function sendGeocodingRequest(location) {
+            var xhr = new XMLHttpRequest();
+            xhr.responseType = "json";
+            xhr.open("GET", "https://api.traveltimeapp.com/v4/geocoding/search?query="+ location)
+            xhr.setRequestHeader( "X-Application-Id", APPLICATION_ID);
+            xhr.setRequestHeader( "X-Api-Key", API_KEY);
+            xhr.setRequestHeader( "Accept-Language", " en-US");
+            xhr.onreadystatechange = function () {
+                if (xhr.status >= 200 && xhr.status < 300) {
+                    if(xhr.readyState === 4){
+                        const travelValue = getTime();
+                        sendTimeMapRequest(xhr.response, travelValue);
+                    }
+                } else {
+                    if(APPLICATION_ID === "place your app id here" || API_KEY ===  "place your api key here") {
+                        document.getElementById("error").style.display = "block";
+                    }
+                }
+            };
+            xhr.send();
+        };
+
 
         function ringCoordsHashToArray(ring) {
             return ring.map(function (latLng) {return [latLng.lat, latLng.lng];});
