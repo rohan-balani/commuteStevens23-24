@@ -28,13 +28,10 @@
             <option value="train">Train</option>
             <option value="driving">Driving</option>
             <option value="cycline">Cycling</option>
-            <option value="driving+train">Driving and Train</option>
             <option value="public_transport">Public Transport</option>
             <option value="coach">Coach</option>
             <option value="ferry">Ferry</option>
             <option value="driving+ferry">Driving and Ferry</option>
-            <option value="cycling+ferry">Cycling and Ferry</option>
-            <option value="cycling+public_transport">Cycling and Public Transport</option>
         </select>
     </div>
 
@@ -72,8 +69,8 @@
 
         
 
-        var APPLICATION_ID = "8f13b8a0";
-        var API_KEY = "6508b20eef4a1fc873163942b8902499";
+         var APPLICATION_ID = "8bffeab4 ";
+        var API_KEY = "2dceedc6ba000a673c99ae04c2e0f76b";
 
         L.tileLayer('https://tiles.traveltime.com/lux/{z}/{x}/{y}.png?key=' + APPLICATION_ID, {
             attribution: 'Map data &copy; <a href="https://www.openstreetmap.org/">OpenStreetMap</a> | Created with <a href="http://traveltimeplatform.com" target="_blank">TravelTime API</a>',
@@ -105,60 +102,66 @@
         }
 
         //Adding travelTime parameter to pass through with default value of 30min
-        function sendTimeMapRequest(geocodingResponse, travelTime=30, transportType) {
-            var coords = geocodingResponse.features[0].geometry.coordinates;
-            var latLng = { lat: coords[1], lng: coords[0] };
-         
-            var request = {
-                departure_searches: [{
-                    id: "first_location",
-                    coords: latLng,
-                    transportation: {
-                        type: transportType },
-                    departure_time: new Date().toJSON(),
-                    travel_time: travelTime * 60
-                }],
-                arrival_searches: []
-            };
-
-            var xhr = new XMLHttpRequest()
-            xhr.addEventListener("readystatechange", function () {
-                if (this.readyState === 4) {
-                    drawTimeMap(mymap, this.response);
-                }
-            });
-            xhr.open("POST", "https://api.traveltimeapp.com/v4/time-map")
-            xhr.setRequestHeader("X-Application-Id", APPLICATION_ID);
-            xhr.setRequestHeader("X-Api-Key", API_KEY);
-            xhr.setRequestHeader("Content-Type", "application/json; charset=UTF-8");
-            xhr.responseType = "json";
-            xhr.send(JSON.stringify(request));
+       function sendGeocodingRequest(location) {
+    var e = document.getElementById("transportation");
+    var transportType = e.value;
+    var xhr = new XMLHttpRequest();
+    xhr.responseType = "json";
+    xhr.open("GET", "https://api.traveltimeapp.com/v4/geocoding/search?query="+ location)
+    xhr.setRequestHeader( "X-Application-Id", APPLICATION_ID);
+    xhr.setRequestHeader( "X-Api-Key", API_KEY);
+    xhr.setRequestHeader( "Accept-Language", " en-US");
+    xhr.onreadystatechange = function () {
+        if (xhr.status >= 200 && xhr.status < 300) {
+            if(xhr.readyState === 4){
+                const travelValue = getTime();
+                sendTimeMapRequest(xhr.response, travelValue, transportType);
+            }
+        } else {
+            if(APPLICATION_ID === "place your app id here" || API_KEY ===  "place your api key here") {
+                document.getElementById("error").style.display = "block";
+            }
         }
+    };
+    xhr.send();
+};
 
-        function sendGeocodingRequest(location) {
-            var e = document.getElementById("transportation");
-            var transportType = e.value;
-            var xhr = new XMLHttpRequest();
-            xhr.responseType = "json";
-            xhr.open("GET", "https://api.traveltimeapp.com/v4/geocoding/search?query="+ location)
-            xhr.setRequestHeader( "X-Application-Id", APPLICATION_ID);
-            xhr.setRequestHeader( "X-Api-Key", API_KEY);
-            xhr.setRequestHeader( "Accept-Language", " en-US");
-            xhr.onreadystatechange = function () {
-                if (xhr.status >= 200 && xhr.status < 300) {
-                    if(xhr.readyState === 4){
-                        const travelValue = getTime();
-                        sendTimeMapRequest(xhr.response, travelValue, transportType);
-                    }
-                } else {
-                    if(APPLICATION_ID === "place your app id here" || API_KEY ===  "place your api key here") {
-                        document.getElementById("error").style.display = "block";
-                    }
-                }
-            };
-            xhr.send();
-        };
+function sendTimeMapRequest(geocodingResponse, travelTime=30, transportType) {
+    
+    mymap.eachLayer(function(layer) {
+        if (layer instanceof L.Polygon) {   //clear instance of polygon layer after each request
+            mymap.removeLayer(layer);
+        }
+    });
 
+    var coords = geocodingResponse.features[0].geometry.coordinates;
+    var latLng = { lat: coords[1], lng: coords[0] };
+
+    var request = {
+        departure_searches: [{
+            id: "first_location",
+            coords: latLng,
+            transportation: {
+                type: transportType },
+            departure_time: new Date().toJSON(),
+            travel_time: travelTime * 60
+        }],
+        arrival_searches: []
+    };
+
+    var xhr = new XMLHttpRequest()
+    xhr.addEventListener("readystatechange", function () {
+        if (this.readyState === 4) {
+            drawTimeMap(mymap, this.response);
+        }
+    });
+    xhr.open("POST", "https://api.traveltimeapp.com/v4/time-map")
+    xhr.setRequestHeader("X-Application-Id", APPLICATION_ID);
+    xhr.setRequestHeader("X-Api-Key", API_KEY);
+    xhr.setRequestHeader("Content-Type", "application/json; charset=UTF-8");
+    xhr.responseType = "json";
+    xhr.send(JSON.stringify(request));
+}
 
         function ringCoordsHashToArray(ring) {
             return ring.map(function (latLng) {return [latLng.lat, latLng.lng];});
