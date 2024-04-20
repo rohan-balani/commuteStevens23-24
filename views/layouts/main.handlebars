@@ -167,6 +167,8 @@ function ringCoordsHashToArray(ring) {
     return ring.map(function (latLng) {return [latLng.lat, latLng.lng];});
 };
 
+var marker;
+
 function drawTimeMap(map, response, locationName) {
     var shapesCoords = response.results[0].shapes.map(function (polygon) {
         var shell = ringCoordsHashToArray(polygon.shell);
@@ -174,13 +176,19 @@ function drawTimeMap(map, response, locationName) {
         return [shell].concat(holes);
     });
 
+    // remove previous marker
+    if (marker) {
+        map.removeLayer(marker);
+    }
+
+
     var polygon = L.polygon(shapesCoords, { color: 'blue' });
     polygon.addTo(map);
 
     var bounds = polygon.getBounds();
     var center = bounds.getCenter();
     // adding a marker at the center of the bounds
-    var marker = L.marker(center).addTo(map);
+    marker = L.marker(center).addTo(map);
     map.fitBounds(bounds);
 };
 
